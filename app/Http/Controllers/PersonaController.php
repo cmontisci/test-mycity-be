@@ -20,13 +20,6 @@ use OpenApi\Attributes as OA;
     name: "Authorization",
     description: "JWT Bearer Token"
 )]
-#[OA\SecurityScheme(
-    securityScheme: "Sanctum",
-    type: "apiKey",
-    in: "header",
-    name: "Authorization",
-    description: "Sanctum Token"
-)]
 class PersonaController extends Controller
 {
 
@@ -37,20 +30,73 @@ class PersonaController extends Controller
         summary: "Get list of personas",
         description: "Returns list of personas",
         security: [ ["Bearer" => []] ],
+        parameters: [
+            new OA\Parameter(
+                name: "page",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "integer"),
+                description: "Page number for pagination"
+            ),
+            new OA\Parameter(
+                name: "per_page",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "integer"),
+                description: "Number of results per page"
+            ),
+            new OA\Parameter(
+                name: "sort",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "string", enum: ["asc", "desc"]),
+                description: "Sort order by surname or name"
+            ),
+            new OA\Parameter(
+                name: "sort_by",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "string", enum: ["nome", "cognome"]),
+                description: "Field to sort by, defaults to registration date"
+            )
+        ],
         responses: [
             new OA\Response(
                 response: 200,
                 description: "Successful operation",
                 content: new OA\JsonContent(
-                    type: "array",
-                    items: new OA\Items(ref: "#/components/schemas/Persona")
+                    type: "object",
+                    properties: [
+                        new OA\Property(
+                            property: "data",
+                            type: "array",
+                            items: new OA\Items(ref: "#/components/schemas/Persona")
+                        ),
+                        new OA\Property(property: "current_page", type: "integer"),
+                        new OA\Property(property: "last_page", type: "integer"),
+                        new OA\Property(property: "per_page", type: "integer"),
+                        new OA\Property(property: "total", type: "integer")
+                    ]
                 )
             )
         ]
     )]
-    public function index()
+    public function index(Request $request)
     {
-        $personas = Persona::all();
+        # default 10 per pagina
+        $perPage = $request->query('per_page', 10);
+
+        // Default sort order is descending for registration date
+        $sortOrder = $request->query('sort', 'desc');
+        $sortBy = $request->query('sort_by', 'created_at');
+
+        // Ensure the sort_by field is either 'nome', 'cognome' or 'created_at'
+        if (!in_array($sortBy, ['nome', 'cognome', 'created_at'])) {
+            $sortBy = 'created_at';
+        }
+
+        $personas = Persona::orderBy($sortBy, $sortOrder)->paginate($perPage);
+
         return response()->json($personas);
     }
 

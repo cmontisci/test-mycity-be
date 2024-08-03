@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthClientController;
 use App\Http\Controllers\Auth\AuthUserController;
+use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
 
@@ -24,7 +25,10 @@ Route::middleware('auth:client')->group(function () {
     Route::get('auth/client/profile', [AuthClientController::class, 'getProfile']);
 });
 
+Route::get('export/personas', [ExportController::class, 'exportPersonas']);
+//Route::middleware('auth:user')->get('export/personas', [ExportController::class, 'exportPersonas']);
 
+//Route::get('export/personas', [ExportController::class, 'exportPersonas']);
 
 //Route::middleware('auth:client')->group(function () {
 //    Route::post('auth/logout', [AuthUserController::class, 'logout']);

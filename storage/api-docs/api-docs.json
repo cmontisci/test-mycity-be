@@ -13,7 +13,7 @@
                 ],
                 "summary": "Autenticazione client",
                 "description": "Effettua il login per un client e restituisce un token",
-                "operationId": "8dd833fca3b3f090c3b6ab76b259c039",
+                "operationId": "0ed8fc3fa756168dbaaf6fa90a8e6472",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -92,7 +92,7 @@
                 ],
                 "summary": "Logout",
                 "description": "Effettua il logout del client",
-                "operationId": "3fc3698d1cff06f3d744cfc51bf41b09",
+                "operationId": "6a72e03122b6e87fb85d555dc30f7028",
                 "requestBody": {},
                 "responses": {
                     "200": {
@@ -143,7 +143,7 @@
                 ],
                 "summary": "Autenticazione utente",
                 "description": "Effettua il login per un utente e restituisce un token",
-                "operationId": "489b863a0a302d8ef4671147ad1a87ce",
+                "operationId": "ed9676d726005c9646a335e30406a09c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -222,7 +222,7 @@
                 ],
                 "summary": "Logout",
                 "description": "Effettua il logout dello user",
-                "operationId": "7399314579b68143cbb391c26b8c64ba",
+                "operationId": "f4e2524706a08c7162e4f653bf3d7491",
                 "requestBody": {},
                 "responses": {
                     "200": {
@@ -266,6 +266,38 @@
                 ]
             }
         },
+        "/api/export-personas": {
+            "get": {
+                "tags": [
+                    "Export"
+                ],
+                "summary": "Esporta le persone in un file CSV e le invia via email",
+                "description": "Questa api esporta le persone in un file CSV e le invia via emai a info@mycity.it.",
+                "operationId": "exportPersonas",
+                "responses": {
+                    "200": {
+                        "description": "Export CSV concluso.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
         "/api/personas": {
             "get": {
                 "tags": [
@@ -274,16 +306,79 @@
                 "summary": "Get list of personas",
                 "description": "Returns list of personas",
                 "operationId": "getPersonasList",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of results per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort order by surname or name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Field to sort by, defaults to registration date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "nome",
+                                "cognome"
+                            ]
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Persona"
-                                    }
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Persona"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -532,12 +627,6 @@
                 "description": "JWT Bearer Token",
                 "name": "Authorization",
                 "in": "header"
-            },
-            "Sanctum": {
-                "type": "apiKey",
-                "description": "Sanctum Token",
-                "name": "Authorization",
-                "in": "header"
             }
         }
     },
@@ -545,6 +634,10 @@
         {
             "name": "Auth",
             "description": "Auth users"
+        },
+        {
+            "name": "Export",
+            "description": "Api per export csv"
         },
         {
             "name": "Personas",
