@@ -4,7 +4,7 @@ Backend -> laravel 11
 Frontend -> Vue 3.4.x con Vuetify (ho scelto quest'ultimo per fare prima visti i componenti disponibili)
 
 # Requisiti
-I requisiti non mi son stai molto chiari, ho interpreto il testo e sviluppato l'applicativo in questo modo:
+I requisiti non mi son stati molto chiari, ho interpreto il testo e sviluppato l'applicativo in questo modo:
 - due sistemi di auth: 
   - USER (accedono tramite SPA Vue)
   - CLIENT (utilizzo delle sole API. Applicativi terze parti o APP per smartphone ?!?)
@@ -85,6 +85,8 @@ php artisan migrate:fresh --seed
 
 Genera chiave configurazione di Passport (premere invio quando richiesto)
 ```bash
+php artisan passport:keys
+
 php artisan passport:client --personal
 ```
 
