@@ -1,66 +1,107 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Progetto
+Backend -> laravel 11
+Frontend -> Vue 3.4.x con Vuetify (quest'ultimo scelto per fare prima visti i componenti disponibili)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Requisiti
+I requisiti non mi son stai molto chiari, ho interpreto il testo e sviluppato l'applicativo in questo modo:
+- due sistemi di auth: 
+  - USER (accedono tramite SPA Vue)
+  - CLIENT (utilizzo delle sole api. Applicativi terze parti o APP per smartphone)
+- pagina LOGIN utente
+- pagina PERSONE: una volta avvenuto il login, deve atterrare in una pagina PERSONE contenente una tabella con i dati delle persone registrate. 
+  - Prevedere la paginazione della tabella. Di default la tabella restituisce le persone registrate dal più recente al meno recente. 
+  - Prevedere un ordinamento alfabetico sul campo nome. 
+  - Prevvedere Una form di inserimento dati per la registrazione di informazioni di una nuova persona (nome, cognome, data di nascita, email, numero di telefono, codice fiscale). 
+    - Nella form deve essere prevista una validazione dei dati e del formato dei dati lato client e lato api
+- Ruoli utente: 
+  - Gli utenti che si autenticano devono prevedere due ruoli diversi. Utenti che hanno permesso di modificare e cancellare e utenti che hanno permessi di sola visualizzazione della tabella
+- Export CVS via email:
+  - Prevedere pulsante di estrazione dei dati della tabella su file .csv ed invio del file per email (destinazione info@mycity.it) attraverso l’uso dei JOB. Se non si dispone di un SMTP da usare per l’invio, prevedere la funzionalità senza l’invio effettivo.
+- Il progetto deve sfruttare il CRUD esposto mediante API
+ 
+# Implementazione
+Per la documentazione della api e il loro utilizzo ho utilizzato swagger.
 
-## About Laravel
+Le entità user e client e mi son sembrate diverse dall persone, quindi gli ho trattati come oggetti separati.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+USER e CLIENT hanno le corrispondenti tabelle su db.
+- USER: accede con email e password
+- CLIENT: accede con client_id e secret_id
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Per entrambi ho creato alcuni utenti di default (utilizzando i seeders).
+  - USER
+    - ROLE_ADMIN: 
+      - email: admin@admin.com
+      - password: admin
+    - ROLE_USER:
+        - email: user@user.com
+        - password: user
+  - CLIENT
+    - ROLE_ADMIN:
+      - client_id: client_1
+      - secret_id: client_1
+    - ROLE_USER:
+      - client_id: client_2
+      - secret_id: client_2
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Le api son suddivise in tre gruppi:
+- Auth (contiene le api per login, logout e profile dei due attori USER e CLIENT)
+- Export (contiene solo l'api per l'export e l'invio del csv via email come richiesto)
+- Personas (contiene tutte le api REST sulle persone. Gli endpoint per la creazione, visualizzazione, update e delete di una singola persona sono autorizzate al solo ruolo ROLE_ADMIN. Per proteggerle ho creato il middleware CheckRole)
 
-## Learning Laravel
+ATTENZIONE: Se effettuate i test delle api da swagger, una volta fatto il login e ottenuto il token occorre fare l'Authorize su swagger inserendo il prefisso Bearer seguito da uno spazio prima del token.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Per tutto il resto non mi sono inventato niente non avendo mai usato laravel.
+Ho utilizzato sail visto che esegue un ambiente dockerizzato.
+Ho aggiunto mailpit per poter simulare un mail server in locale e ottenere il file csv.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Setup
+Per creare/installare la build in locale:
+```bash
+./localbuild.sh
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Creaiamo il file env copiandolo da env.local
+```bash
+cp .env.local .env
+```
 
-## Laravel Sponsors
+Eseguiamo l'ambiente con sail:
+```bash
+./vendor/bin/sail up
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Apriamo una nuova shell ed entriamo dentro l'immagine docker in esecuzione:
+```bash
+./vendor/bin/sail shell
+```
 
-### Premium Partners
+### Da dentro l'immagine docker:
+Migration e seed (resetta tutto)
+```bash
+php artisan migrate:fresh --seed
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Genera chiave configurazione di Passport (premere invio quando richiesto)
+```bash
+php artisan passport:client --personal
+```
 
-## Contributing
+Genera la documentazione Swagger:
+```bash
+php artisan l5-swagger:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Esegui il worker della coda:
+```bash
+php artisan queue:work
+```
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Endpoint 
+Se tutto è andato a buon fine dovremmo avere:
+- swagger: http://localhost/api/documentation
+- mailpit: http://localhost:8025/
+- database: 
+  - localhost:3306 
+  - user: sail
+   - password: password 
