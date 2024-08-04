@@ -1,17 +1,18 @@
 # Progetto
 Backend -> laravel 11
-Frontend -> Vue 3.4.x con Vuetify (quest'ultimo scelto per fare prima visti i componenti disponibili)
+
+Frontend -> Vue 3.4.x con Vuetify (ho scelto quest'ultimo per fare prima visti i componenti disponibili)
 
 # Requisiti
 I requisiti non mi son stai molto chiari, ho interpreto il testo e sviluppato l'applicativo in questo modo:
 - due sistemi di auth: 
   - USER (accedono tramite SPA Vue)
-  - CLIENT (utilizzo delle sole api. Applicativi terze parti o APP per smartphone)
+  - CLIENT (utilizzo delle sole API. Applicativi terze parti o APP per smartphone ?!?)
 - pagina LOGIN utente
 - pagina PERSONE: una volta avvenuto il login, deve atterrare in una pagina PERSONE contenente una tabella con i dati delle persone registrate. 
   - Prevedere la paginazione della tabella. Di default la tabella restituisce le persone registrate dal più recente al meno recente. 
   - Prevedere un ordinamento alfabetico sul campo nome. 
-  - Prevvedere Una form di inserimento dati per la registrazione di informazioni di una nuova persona (nome, cognome, data di nascita, email, numero di telefono, codice fiscale). 
+  - Prevvedere una form di inserimento dati per la registrazione di informazioni di una nuova persona (nome, cognome, data di nascita, email, numero di telefono, codice fiscale). 
     - Nella form deve essere prevista una validazione dei dati e del formato dei dati lato client e lato api
 - Ruoli utente: 
   - Gli utenti che si autenticano devono prevedere due ruoli diversi. Utenti che hanno permesso di modificare e cancellare e utenti che hanno permessi di sola visualizzazione della tabella
@@ -20,13 +21,13 @@ I requisiti non mi son stai molto chiari, ho interpreto il testo e sviluppato l'
 - Il progetto deve sfruttare il CRUD esposto mediante API
  
 # Implementazione
-Per la documentazione della api e il loro utilizzo ho utilizzato swagger.
+Per la documentazione delle API e il loro utilizzo ho utilizzato **swagger**.
 
-Le entità user e client e mi son sembrate diverse dall persone, quindi gli ho trattati come oggetti separati.
+Le entità **user** e **client** e mi son sembrate diverse dalle **persone**, quindi gli ho trattati come oggetti separati.
 
-USER e CLIENT hanno le corrispondenti tabelle su db.
-- USER: accede con email e password
-- CLIENT: accede con client_id e secret_id
+**USER** e **CLIENT** hanno le corrispondenti tabelle su db.
+- USER: accede con _email_ e _password_
+- CLIENT: accede con _client_id_ e _secret_id_
 
 Per entrambi ho creato alcuni utenti di default (utilizzando i seeders).
   - USER
@@ -45,15 +46,15 @@ Per entrambi ho creato alcuni utenti di default (utilizzando i seeders).
       - secret_id: client_2
 
 Le api son suddivise in tre gruppi:
-- Auth (contiene le api per login, logout e profile dei due attori USER e CLIENT)
-- Export (contiene solo l'api per l'export e l'invio del csv via email come richiesto)
-- Personas (contiene tutte le api REST sulle persone. Gli endpoint per la creazione, visualizzazione, update e delete di una singola persona sono autorizzate al solo ruolo ROLE_ADMIN. Per proteggerle ho creato il middleware CheckRole)
+- **Auth** (contiene le api per **_login_**, **_logout_** e **_profile_** dei due attori USER e CLIENT)
+- **Export** (contiene solo l'api per l'export e l'invio del csv via email come richiesto)
+- **Personas** (contiene tutte le api REST sulle persone. Gli endpoint per la **_creazione_**, **_visualizzazione_**, **_update_** e **_delete_** di una singola persona sono autorizzate al solo ruolo **ROLE_ADMIN**. Per proteggerle ho creato il middleware **CheckRole**)
 
-ATTENZIONE: Se effettuate i test delle api da swagger, una volta fatto il login e ottenuto il token occorre fare l'Authorize su swagger inserendo il prefisso Bearer seguito da uno spazio prima del token.
+**ATTENZIONE**: Se effettuate i test delle api da swagger, una volta fatto il login e ottenuto il token occorre fare l'Authorize su swagger inserendo il prefisso **Bearer** _seguito da uno spazio prima del token_.
 
-Per tutto il resto non mi sono inventato niente non avendo mai usato laravel.
-Ho utilizzato sail visto che esegue un ambiente dockerizzato.
-Ho aggiunto mailpit per poter simulare un mail server in locale e ottenere il file csv.
+Per tutto il resto non mi sono inventato niente di particolare essendo il mio primo utilizzo di laravel.
+Ho utilizzato **sail** visto che esegue un ambiente dockerizzato.
+Ho aggiunto **mailpit** per poter simulare un mail server in locale e ottenere il file csv.
 
 # Setup
 Per creare/installare la build in locale:
