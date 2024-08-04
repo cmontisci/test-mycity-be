@@ -54,3 +54,6 @@ php artisan view:clear
 
 Cancellare la Cache Applicativa:
 php artisan cache:clear
+
+Generare chiave:
+php artisan passport:client --personal

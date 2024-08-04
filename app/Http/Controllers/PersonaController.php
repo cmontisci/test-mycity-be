@@ -85,6 +85,7 @@ class PersonaController extends Controller
     {
         # default 10 per pagina
         $perPage = $request->query('per_page', 10);
+        $perPage = $perPage == -1 ? null : $perPage;
 
         // Default sort order is descending for registration date
         $sortOrder = $request->query('sort', 'desc');
@@ -132,7 +133,7 @@ class PersonaController extends Controller
             'cognome' => 'required|string|max:255',
             'data_di_nascita' => 'required|date',
             'email' => 'required|email|unique:personas,email',
-            'numero' => 'required|string|max:15',
+            'telefono' => 'required|string|max:15',
             'codice_fiscale' => 'required|string|size:16|unique:personas,codice_fiscale',
         ]);
 
@@ -161,12 +162,16 @@ class PersonaController extends Controller
                 description: "Successful operation",
                 content: new OA\JsonContent(ref: "#/components/schemas/Persona")
             ),
-            new OA\Response(response: 404, description: "Persona not found")
+            new OA\Response(response: 404, description: "Persona non trovata")
         ]
     )]
-    public function show(Persona $persona)
+    public function show($id)
     {
-        return response()->json($persona);
+        $persona = Persona::find($id);
+        if($persona) {
+            return response()->json($persona);
+        }
+        return response()->json(['message' => 'Persona non trovata'], 404);
     }
 
     #[OA\Put(
@@ -195,27 +200,32 @@ class PersonaController extends Controller
                     new OA\Property(property: "errors", type: "array", items: new OA\Items(type: "string"))
                 ])
             ),
-            new OA\Response(response: 404, description: "Persona not found")
+            new OA\Response(response: 404, description: "Persona non trovata")
         ]
     )]
-    public function update(Request $request, Persona $persona)
+    public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required|string|max:255',
-            'cognome' => 'required|string|max:255',
-            'data_di_nascita' => 'required|date',
-            'email' => 'required|email|unique:personas,email,' . $persona->id,
-            'numero' => 'required|string|max:15',
-            'codice_fiscale' => 'required|string|size:16|unique:personas,codice_fiscale,' . $persona->id,
-        ]);
+        $persona = Persona::find($id);
+        if($persona) {
+            $validator = Validator::make($request->all(), [
+                'nome' => 'required|string|max:255',
+                'cognome' => 'required|string|max:255',
+                'data_di_nascita' => 'required|date',
+                'email' => 'required|email|unique:personas,email,' . $persona->id,
+                'telefono' => 'required|string|max:15',
+                'codice_fiscale' => 'required|string|size:16|unique:personas,codice_fiscale,' . $persona->id,
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $persona->update($request->all());
+
+            return response()->json($persona);
         }
 
-        $persona->update($request->all());
-
-        return response()->json($persona);
+        return response()->json(['message' => 'Persona non trovata'], 404);
     }
 
     #[OA\Delete(
@@ -229,14 +239,17 @@ class PersonaController extends Controller
             new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
         ],
         responses: [
-            new OA\Response(response: 200, description: "Persona deleted successfully"),
-            new OA\Response(response: 404, description: "Persona not found")
+            new OA\Response(response: 200, description: "Persona eliminata con successo"),
+            new OA\Response(response: 404, description: "Persona non trovata")
         ]
     )]
-    public function destroy(Persona $persona)
+    public function destroy($id)
     {
-        $persona->delete();
-
-        return response()->json(['message' => 'Persona eliminata con successo.']);
+        $persona = Persona::find($id);
+        if($persona){
+            $persona->delete();
+            return response()->json(['message' => 'Persona eliminata con successo.']);
+        }
+        return response()->json(['message' => 'Persona non trovata'], 404);
     }
 }

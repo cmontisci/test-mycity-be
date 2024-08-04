@@ -17,7 +17,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: "cognome", type: "string"),
         new OA\Property(property: "data_di_nascita", type: "string", format: "date"),
         new OA\Property(property: "email", type: "string", format: "email"),
-        new OA\Property(property: "numero", type: "string"),
+        new OA\Property(property: "telefono", type: "string"),
         new OA\Property(property: "codice_fiscale", type: "string")
     ]
 )]

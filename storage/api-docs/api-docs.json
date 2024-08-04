@@ -266,7 +266,7 @@
                 ]
             }
         },
-        "/api/export-personas": {
+        "/api/export/personas": {
             "get": {
                 "tags": [
                     "Export"
@@ -473,7 +473,7 @@
                         }
                     },
                     "404": {
-                        "description": "Persona not found"
+                        "description": "Persona non trovata"
                     }
                 },
                 "security": [
@@ -538,7 +538,7 @@
                         }
                     },
                     "404": {
-                        "description": "Persona not found"
+                        "description": "Persona non trovata"
                     }
                 },
                 "security": [
@@ -566,10 +566,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Persona deleted successfully"
+                        "description": "Persona eliminata con successo"
                     },
                     "404": {
-                        "description": "Persona not found"
+                        "description": "Persona non trovata"
                     }
                 },
                 "security": [
@@ -611,7 +611,7 @@
                         "type": "string",
                         "format": "email"
                     },
-                    "numero": {
+                    "telefono": {
                         "type": "string"
                     },
                     "codice_fiscale": {
@@ -637,7 +637,7 @@
         },
         {
             "name": "Export",
-            "description": "Api per export csv"
+            "description": "Export in file"
         },
         {
             "name": "Personas",

@@ -3,13 +3,9 @@
 use App\Http\Controllers\Auth\AuthClientController;
 use App\Http\Controllers\Auth\AuthUserController;
 use App\Http\Controllers\ExportController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
-
-//Route::middleware('auth:sanctum')->group(function () {
-//    // Rotte API per Persona
-//    Route::apiResource('personas', PersonaController::class);
-//});
+use App\Http\Middleware\CheckRole;
+use Illuminate\Support\Facades\Route;
 
 // Rotte per l'autenticazione User
 Route::post('auth/user/login', [AuthUserController::class, 'login']);
@@ -25,37 +21,23 @@ Route::middleware('auth:client')->group(function () {
     Route::get('auth/client/profile', [AuthClientController::class, 'getProfile']);
 });
 
-Route::get('export/personas', [ExportController::class, 'exportPersonas']);
-//Route::middleware('auth:user')->get('export/personas', [ExportController::class, 'exportPersonas']);
-
-//Route::get('export/personas', [ExportController::class, 'exportPersonas']);
-
-//Route::middleware('auth:client')->group(function () {
-//    Route::post('auth/logout', [AuthUserController::class, 'logout']);
-//    Route::get('auth/user', [AuthUserController::class, 'getUser']);
-//});
-
-// Rotte protette per gli utenti (Sanctum)
-//Route::middleware(['auth:sanctum'])->group(function () {
-//    Route::apiResource('/personas', PersonaController::class);
-//});
-//
-//// Rotte protette per i client (JWT)
-//Route::middleware(['check.user.type:client'])->group(function () {
-//    Route::apiResource('/personas', PersonaController::class);
-//});
+// Rotte per l'export csv
+Route::middleware('auth:user')->group(function () {
+    Route::get('export/personas', [ExportController::class, 'exportPersonas']);
+});
 
 
-//Route::middleware('auth:sanctum')->group(function () {
-//    Route::apiResource('/personas', PersonaController::class);
-//});
+// Rotte per persona
+Route::middleware('auth:user')->group(function () {
+    Route::get('/personas', [PersonaController::class, 'index']);
 
-//Route::middleware('auth')->group(function () {
-//    Route::apiResource('personas', PersonaController::class);
-//});
+    Route::middleware('checkRole:ROLE_ADMIN')->group(function () {
+        Route::post('/personas', [PersonaController::class, 'store']);
+        Route::get('/personas/{id}', [PersonaController::class, 'show']);
+        Route::put('/personas/{id}', [PersonaController::class, 'update']);
+        Route::delete('/personas/{id}', [PersonaController::class, 'destroy']);
+    });
+});
 
-Route::apiResource('personas', PersonaController::class)->middleware('auth:user');
 
-//Route::middleware('auth:client')->group(function () {
-//    Route::apiResource('/personas', PersonaController::class);
-//});
+
