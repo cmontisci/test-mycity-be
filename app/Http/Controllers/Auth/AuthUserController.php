@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Passport\HasApiTokens;
 use OpenApi\Attributes as OA;
-use Illuminate\Support\Facades\Auth;
 
 #[OA\Tag(name: "Auth", description: "Auth users")]
 class AuthUserController extends Controller
@@ -58,18 +58,30 @@ class AuthUserController extends Controller
             'password' => 'required|string',
         ]);
 
-        $credentials = request(['email', 'password']);
+//        $credentials = request(['email', 'password']);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+//        Auth::shouldUse('user');
+//        if (!Auth::attempt($credentials)) {
+//            return response()->json(['message' => 'Unauthorized'], 401);
+//        }
+
+//        if (!Auth::guard('user')->setUser($credentials)) {
+//            return response()->json(['message' => 'Unauthorized'], 401);
+//        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !$user->validateForPassportPasswordGrant($request->password)) {
+            return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
         }
 
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
+//        $request->session()->regenerate();
+//        Auth::guard('user')->setUser($client);
+        auth()->guard('user')->setUser($user);
 
-        $token->save();
-
+        $tokenResult = $user->createToken('ClientToken', ['user-access']);
+//        $token = $tokenResult->token;
+//        $token->save();
         return response()->json([
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
@@ -94,6 +106,13 @@ class AuthUserController extends Controller
     )]
     public function logout(Request $request)
     {
+        if (!$request->user() ||
+            !($request->user()?->tokens[0]?->can('user-access')) ||
+            !($request->user() instanceof User))
+        {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         $request->user()->token()->revoke();
 
         return response()->json(['message' => 'Successfully logged out']);
@@ -116,6 +135,12 @@ class AuthUserController extends Controller
     )]
     public function getProfile(Request $request)
     {
+        if (!$request->user() ||
+            !($request->user()?->tokens[0]?->can('user-access')) ||
+            !($request->user() instanceof User))
+        {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         return response()->json($request->user());
     }
 }

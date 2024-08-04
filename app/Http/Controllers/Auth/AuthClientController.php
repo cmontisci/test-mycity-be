@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Laravel\Passport\HasApiTokens;
 use OpenApi\Attributes as OA;
-use Illuminate\Support\Facades\Auth;
 
 #[OA\Tag(name: "Auth", description: "Auth clients")]
 class AuthClientController extends Controller
@@ -52,24 +52,26 @@ class AuthClientController extends Controller
     )]
     public function login(Request $request)
     {
-        // Logica di autenticazione per i client
         $request->validate([
             'client_id' => 'required|string',
             'secret_id' => 'required|string',
         ]);
 
-        $credentials = request(['client_id', 'secret_id']);
+//        $credentials = request(['client_id', 'secret_id']);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $client = Client::where('client_id', $request->client_id)->first();
+
+        if (!$client || !$client->validateForPassportPasswordGrant($request->secret_id)) {
+            return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
         }
 
-        $client = $request->client();
-        $tokenResult = $client->createToken('Personal Access Token');
-        $token = $tokenResult->token;
+//        $request->session()->regenerate();
+//        Auth::guard('client')->setUser($client);
+        auth()->guard('client')->setUser($client);
 
-        $token->save();
-
+        $tokenResult = $client->createToken('ClientToken', ['client-access']);
+//        $token = $tokenResult->token;
+//        $token->save();
         return response()->json([
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
@@ -94,8 +96,14 @@ class AuthClientController extends Controller
     )]
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
+        if (!$request->user() ||
+            !($request->user()?->tokens[0]?->can('client-access')) ||
+            !($request->user() instanceof Client))
+        {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
+        $request->user()->token()->revoke();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -116,6 +124,12 @@ class AuthClientController extends Controller
     )]
     public function getProfile(Request $request)
     {
+        if (!$request->user() ||
+            !($request->user()?->tokens[0]?->can('client-access')) ||
+            !($request->user() instanceof Client))
+        {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         return response()->json($request->user());
     }
 }

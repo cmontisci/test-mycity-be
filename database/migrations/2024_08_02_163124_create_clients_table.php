@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('client_id')->unique();
             $table->string('secret_id');
+            $table->integer('role_id');
             $table->timestamps();
         });
 

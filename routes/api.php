@@ -4,7 +4,6 @@ use App\Http\Controllers\Auth\AuthClientController;
 use App\Http\Controllers\Auth\AuthUserController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PersonaController;
-use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
 // Rotte per l'autenticazione User
@@ -22,13 +21,12 @@ Route::middleware('auth:client')->group(function () {
 });
 
 // Rotte per l'export csv
-Route::middleware('auth:user')->group(function () {
+Route::middleware(['multiAuth:user,client'])->group(function () {
     Route::get('export/personas', [ExportController::class, 'exportPersonas']);
 });
 
-
 // Rotte per persona
-Route::middleware('auth:user')->group(function () {
+Route::middleware(['multiAuth:user,client'])->group(function () {
     Route::get('/personas', [PersonaController::class, 'index']);
 
     Route::middleware('checkRole:ROLE_ADMIN')->group(function () {

@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
-use Carbon\Laravel\ServiceProvider;
+use App\Models\Client;
+use App\Models\User;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -22,11 +25,17 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Passport::routes();
+        Passport::tokensCan([
+            'user-access' => 'User Type',
+            'client-access' => 'Client Type',
+        ]);
 
-        // Configura la scadenza dei token se necessario
-        Passport::tokensExpireIn(now()->addDays(15));
-        Passport::refreshTokensExpireIn(now()->addDays(30));
-        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        Gate::define('user-access', function ($user) {
+            return $user instanceof User;
+        });
+
+        Gate::define('client-access', function ($user) {
+            return $user instanceof Client;
+        });
     }
 }
