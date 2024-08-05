@@ -21,7 +21,7 @@
                             "schema": {
                                 "required": [
                                     "client_id",
-                                    "secret_id"
+                                    "password"
                                 ],
                                 "properties": {
                                     "client_id": {

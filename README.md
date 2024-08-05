@@ -83,7 +83,12 @@ Apriamo una nuova shell ed entriamo dentro l'immagine docker in esecuzione:
 ```
 
 ### Da dentro l'immagine docker:
-Migration e seed (resetta tutto)
+Migration e seed
+```bash
+php artisan migrate
+php artisan db:seed
+```
+oppure in caso di errori
 ```bash
 php artisan migrate:fresh --seed
 ```
@@ -113,3 +118,9 @@ Se tutto è andato a buon fine dovremmo avere:
   - localhost:3306 
   - user: sail
    - password: password 
+
+
+### Per fermare l'esecuzione:
+```bash
+./vendor/bin/sail up
+```
