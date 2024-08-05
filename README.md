@@ -62,50 +62,53 @@ Ho aggiunto **mailpit** per poter simulare un mail server in locale e ottenere i
 - Non avevo mai utilizzato laravel e mi è sembrato magico per alcuni versi e ostico per altri. Magico perchè se si chiedono robe standard basta lanciare qualche comando e tutto funziona ma se si ha bisogno di qualcosa di custom mi sembra più complesso trovare una soluzione. Symfony mi sembra più "standard" come logiche e fa meno uso di convenzioni ma sicuramente questa sensazione è dovuta all'esperienza che ho con il framework.
 
 # Setup
-Per creare/installare la build in locale:
+1. Per creare/installare la build in locale:
 ```bash
 ./localbuild.sh
 ```
 
-Creaiamo il file env copiandolo da env.local
+2. Creaiamo il file env copiandolo da env.local
 ```bash
 cp .env.local .env
 ```
 
-Eseguiamo l'ambiente con sail:
+3. Eseguiamo l'ambiente con sail:
 ```bash
 ./vendor/bin/sail up
 ```
 
-Apriamo una nuova shell ed entriamo dentro l'immagine docker in esecuzione:
+4. Apriamo una nuova shell ed entriamo dentro l'immagine docker in esecuzione:
 ```bash
 ./vendor/bin/sail shell
 ```
 
 ### Da dentro l'immagine docker:
-Migration e seed
+5. Migration
 ```bash
 php artisan migrate
+```
+Seed (Se non viene migrato niente il db è apposto. Saltiamo al punto 6. Se invece avvengono delle migrazioni occorre proseguire con il seed
+```bash
 php artisan db:seed
 ```
-oppure in caso di errori
-```bash
-php artisan migrate:fresh --seed
-```
+oppure in caso di errori:
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
 
-Genera chiave configurazione di Passport (premere invio quando richiesto)
+6. Genera chiave configurazione di Passport (premere invio quando richiesto)
 ```bash
 php artisan passport:keys
 
 php artisan passport:client --personal
 ```
 
-Genera la documentazione Swagger:
+7. Genera la documentazione Swagger:
 ```bash
 php artisan l5-swagger:generate
 ```
 
-Esegui il worker della coda:
+8. Esegui il worker della coda:
 ```bash
 php artisan queue:work
 ```
@@ -122,5 +125,5 @@ Se tutto è andato a buon fine dovremmo avere:
 
 ### Per fermare l'esecuzione:
 ```bash
-./vendor/bin/sail up
+./vendor/bin/sail down
 ```
