@@ -23,6 +23,8 @@ I requisiti non mi son stati molto chiari, ho interpreto il testo e sviluppato l
 # Implementazione
 Per la documentazione delle API e il loro utilizzo ho utilizzato **swagger**.
 
+Per l'autenticazione ho utilizzato passport e l'accesso avviene con un token Bearer.
+
 Le entità **user** e **client** e mi son sembrate diverse dalle **persone**, quindi gli ho trattati come oggetti separati.
 
 **USER** e **CLIENT** li ho gestiti come userTypes della tabella Users.
