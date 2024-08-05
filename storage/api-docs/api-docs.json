@@ -29,7 +29,7 @@
                                         "format": "string",
                                         "example": "client_1"
                                     },
-                                    "secret_id": {
+                                    "password": {
                                         "type": "string",
                                         "format": "password",
                                         "example": "secret_1"

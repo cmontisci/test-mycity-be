@@ -56,7 +56,8 @@ class ExportPersonasToCsv implements ShouldQueue
         fclose($file);
 
         // Send email with the CSV attachment
-        Mail::to('info@mycity.it')->send(new PersonasCsvMail($csvFileName, $csvFilePath));
+        Mail::to('info@mycity.it')
+            ->send(new PersonasCsvMail($csvFileName, $csvFilePath));
 
         // Delete the CSV file after sending the email
         Storage::delete($csvFileName);

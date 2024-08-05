@@ -42,7 +42,7 @@ return [
         ],
         'client' => [
             'driver' => 'passport',
-            'provider' => 'clients',
+            'provider' => 'users',
         ],
     ],
 
@@ -71,7 +71,7 @@ return [
 
         'clients' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Client::class,
+            'model' => App\Models\User::class,
         ],
     ],
 

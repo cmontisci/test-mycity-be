@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => Hash::make('admin'),
             'role_id' => 1,
+            'user_type_id' => 1
         ]);
 
         User::create([
@@ -25,7 +26,23 @@ class UserSeeder extends Seeder
             'email' => 'user@user.com',
             'password' => Hash::make('user'),
             'role_id' => 2,
+            'user_type_id' => 1
         ]);
 
+        User::create([
+            'name' => 'Client User 1',
+            'client_id' => 'client_1',
+            'password' => Hash::make('secret_1'),
+            'role_id' => 1,
+            'user_type_id' => 2
+        ]);
+
+        User::create([
+            'name' => 'Client User 2',
+            'client_id' => 'client_2',
+            'password' => Hash::make('secret_2'),
+            'role_id' => 2,
+            'user_type_id' => 2
+        ]);
     }
 }

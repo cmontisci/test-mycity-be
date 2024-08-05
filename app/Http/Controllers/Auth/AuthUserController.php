@@ -75,11 +75,9 @@ class AuthUserController extends Controller
             return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
         }
 
-//        $request->session()->regenerate();
-//        Auth::guard('user')->setUser($client);
         auth()->guard('user')->setUser($user);
 
-        $tokenResult = $user->createToken('ClientToken', ['user-access']);
+        $tokenResult = $user->createToken('UserToken', ['user-access']);
 //        $token = $tokenResult->token;
 //        $token->save();
         return response()->json([
@@ -106,12 +104,10 @@ class AuthUserController extends Controller
     )]
     public function logout(Request $request)
     {
-        if (!$request->user() ||
-            !($request->user()?->tokens[0]?->can('user-access')) ||
-            !($request->user() instanceof User))
-        {
+        if (!$request->user()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
 
         $request->user()->token()->revoke();
 
@@ -135,12 +131,10 @@ class AuthUserController extends Controller
     )]
     public function getProfile(Request $request)
     {
-        if (!$request->user() ||
-            !($request->user()?->tokens[0]?->can('user-access')) ||
-            !($request->user() instanceof User))
-        {
+        if (!$request->user()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
         return response()->json($request->user());
     }
 }

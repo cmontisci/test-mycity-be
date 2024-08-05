@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
-use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Passport\HasApiTokens;
 use OpenApi\Attributes as OA;
@@ -20,10 +20,10 @@ class AuthClientController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["client_id", "secret_id"],
+                required: ["client_id", "password"],
                 properties: [
                     new OA\Property(property: "client_id", type: "string", format: "string", example: "client_1"),
-                    new OA\Property(property: "secret_id", type: "string", format: "password", example: "secret_1")
+                    new OA\Property(property: "password", type: "string", format: "password", example: "secret_1")
                 ]
             )
         ),
@@ -54,22 +54,22 @@ class AuthClientController extends Controller
     {
         $request->validate([
             'client_id' => 'required|string',
-            'secret_id' => 'required|string',
+            'password' => 'required|string',
         ]);
 
 //        $credentials = request(['client_id', 'secret_id']);
 
-        $client = Client::where('client_id', $request->client_id)->first();
+        $user = User::where('client_id', $request->client_id)->first();
 
-        if (!$client || !$client->validateForPassportPasswordGrant($request->secret_id)) {
+        if (!$user || !$user->validateForPassportPasswordGrant($request->password)) {
             return response()->json(['error' => 'The provided credentials are incorrect.'], 401);
         }
 
 //        $request->session()->regenerate();
 //        Auth::guard('client')->setUser($client);
-        auth()->guard('client')->setUser($client);
+        auth()->guard('client')->setUser($user);
 
-        $tokenResult = $client->createToken('ClientToken', ['client-access']);
+        $tokenResult = $user->createToken('ClientToken', ['client-access']);
 //        $token = $tokenResult->token;
 //        $token->save();
         return response()->json([
@@ -96,10 +96,7 @@ class AuthClientController extends Controller
     )]
     public function logout(Request $request)
     {
-        if (!$request->user() ||
-            !($request->user()?->tokens[0]?->can('client-access')) ||
-            !($request->user() instanceof Client))
-        {
+        if (!$request->user()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -124,12 +121,10 @@ class AuthClientController extends Controller
     )]
     public function getProfile(Request $request)
     {
-        if (!$request->user() ||
-            !($request->user()?->tokens[0]?->can('client-access')) ||
-            !($request->user() instanceof Client))
-        {
+        if (!$request->user()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
         return response()->json($request->user());
     }
 }

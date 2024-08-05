@@ -2,11 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Client;
-use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -29,13 +26,5 @@ class AuthServiceProvider extends ServiceProvider
             'user-access' => 'User Type',
             'client-access' => 'Client Type',
         ]);
-
-        Gate::define('user-access', function ($user) {
-            return $user instanceof User;
-        });
-
-        Gate::define('client-access', function ($user) {
-            return $user instanceof Client;
-        });
     }
 }

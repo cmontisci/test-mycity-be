@@ -20,8 +20,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'client_id',
         'password',
-        'role_id'
+        'role_id',
+        'user_type_id'
     ];
 
     /**
@@ -52,12 +54,19 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
-    /**
-     * Find the user instance for the given email.
-     */
-    public function findForPassport(string $email): User
+    public function userType()
+    {
+        return $this->belongsTo(UserType::class);
+    }
+
+    public function findForPassportByEmail(string $email): User
     {
         return $this->where('email', $email)->first();
+    }
+
+    public function findForPassportByClientId(string $client_id): User
+    {
+        return $this->where('client_id', $client_id)->first();
     }
 
     public function validateForPassportPasswordGrant(string $password): bool

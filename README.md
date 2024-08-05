@@ -25,9 +25,9 @@ Per la documentazione delle API e il loro utilizzo ho utilizzato **swagger**.
 
 Le entità **user** e **client** e mi son sembrate diverse dalle **persone**, quindi gli ho trattati come oggetti separati.
 
-**USER** e **CLIENT** hanno le corrispondenti tabelle su db.
+**USER** e **CLIENT** li ho gestiti come userTypes della tabella Users.
 - USER: accede con _email_ e _password_
-- CLIENT: accede con _client_id_ e _secret_id_
+- CLIENT: accede con _client_id_ e _password_
 
 Per entrambi ho creato alcuni utenti di default (utilizzando i seeders).
   - USER
@@ -35,15 +35,15 @@ Per entrambi ho creato alcuni utenti di default (utilizzando i seeders).
       - email: admin@admin.com
       - password: admin
     - ROLE_USER:
-        - email: user@user.com
-        - password: user
+      - email: user@user.com
+      - password: user
   - CLIENT
     - ROLE_ADMIN:
       - client_id: client_1
-      - secret_id: client_1
+      - password: secret_1
     - ROLE_USER:
       - client_id: client_2
-      - secret_id: client_2
+      - password: secret_2
 
 Le api son suddivise in tre gruppi:
 - **Auth** (contiene le api per **_login_**, **_logout_** e **_profile_** dei due attori USER e CLIENT)
@@ -55,6 +55,11 @@ Le api son suddivise in tre gruppi:
 Per tutto il resto non mi sono inventato niente di particolare essendo il mio primo utilizzo di laravel.
 Ho utilizzato **sail** visto che esegue un ambiente dockerizzato.
 Ho aggiunto **mailpit** per poter simulare un mail server in locale e ottenere il file csv.
+
+# Osservazioni
+- volevo utilizzare due tabelle distinte per USER e CLIENT ma ci stavo perdendo più tempo del prevvisto. Non ho ben capito se è un limite di laravel o mio (molto probabile).  Il problema che ho incontrato è questo: https://stackoverflow.com/questions/57484680/multi-users-with-passport-how-to-get-authenticated-user-type e si dovrebbe risolvere così: https://medium.com/@hamisjuma1/taking-laravel-passport-to-the-next-level-multi-model-authentication-authorization-and-auditing-81d702c15766 . Ho deciso quindi di tornare indietro e utilizzare una user_type_id all'interno della tabella users.
+- lato frontend ci sono alcuni problemi sul component datepicker nella data di nascita. Anche li non ci ho perso più tempo del prevvisto. Mi sembra un errore di decodifica della data se la si inserisce a mano. Selezionandola dal calendario funziona correttamente.
+- Non avevo mai utilizzato laravel e mi è sembrato magico per alcuni versi e ostico per altri. Magico perchè se si chiedono robe standard basta lanciare qualche comando e tutto funziona ma se si ha bisogno di qualcosa di custom mi sembra più complesso trovare una soluzione. Symfony mi sembra più "standard" come logiche e fa meno uso di convenzioni ma sicuramente questa sensazione è dovuta all'esperienza che ho con il framework.
 
 # Setup
 Per creare/installare la build in locale:
@@ -100,7 +105,7 @@ Esegui il worker della coda:
 php artisan queue:work
 ```
 
-## Endpoint 
+# Endpoint 
 Se tutto è andato a buon fine dovremmo avere:
 - swagger: http://localhost/api/documentation
 - mailpit: http://localhost:8025/

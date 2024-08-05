@@ -8,25 +8,25 @@ use Illuminate\Support\Facades\Route;
 
 // Rotte per l'autenticazione User
 Route::post('auth/user/login', [AuthUserController::class, 'login']);
-Route::middleware('auth:user')->group(function () {
+Route::middleware(['auth:user','checkUserType:USER'])->group(function () {
     Route::post('auth/user/logout', [AuthUserController::class, 'logout']);
     Route::get('auth/user/profile', [AuthUserController::class, 'getProfile']);
 });
 
 // Rotte per l'autenticazione Client
 Route::post('auth/client/login', [AuthClientController::class, 'login']);
-Route::middleware('auth:client')->group(function () {
+Route::middleware(['auth:user','checkUserType:CLIENT'])->group(function () {
     Route::post('auth/client/logout', [AuthClientController::class, 'logout']);
     Route::get('auth/client/profile', [AuthClientController::class, 'getProfile']);
 });
 
 // Rotte per l'export csv
-Route::middleware(['multiAuth:user,client'])->group(function () {
+Route::middleware('auth:user')->group(function () {
     Route::get('export/personas', [ExportController::class, 'exportPersonas']);
 });
 
 // Rotte per persona
-Route::middleware(['multiAuth:user,client'])->group(function () {
+Route::middleware('auth:user')->group(function () {
     Route::get('/personas', [PersonaController::class, 'index']);
 
     Route::middleware('checkRole:ROLE_ADMIN')->group(function () {
@@ -36,6 +36,7 @@ Route::middleware(['multiAuth:user,client'])->group(function () {
         Route::delete('/personas/{id}', [PersonaController::class, 'destroy']);
     });
 });
+
 
 
 
